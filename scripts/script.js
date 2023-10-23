@@ -11,7 +11,10 @@ const temperature = document.querySelector('.temperature')
 const weatherDescription = document.querySelector('.weather-description')
 const wind = document.querySelector('.wind')
 const humidity = document.querySelector('.humidity')
-
+const changeQuoteBtn = document.querySelector('.change-quote')
+const quote = document.querySelector('.quote')
+const author = document.querySelector('.author')
+let currentQuoteIndex = Math.floor(Math.random() * 6)
 
 
 
@@ -170,3 +173,26 @@ function setCity(event) {
 
 window.addEventListener('load', getWeather)
 cityInput.addEventListener('keypress', setCity)
+
+
+
+
+async function getQuotes() {  
+  const quotes = 'scripts/quotes.json'
+  const res = await fetch(quotes)
+  const data = await res.json()
+
+  currentQuoteIndex += 1
+  if (currentQuoteIndex > 5) {
+    currentQuoteIndex = 0
+  } else if (currentQuoteIndex < 0) {
+    currentQuoteIndex = 6
+  }
+  
+  quote.textContent = `"${data[currentQuoteIndex].text}"`
+  author.textContent = data[currentQuoteIndex].author
+}
+
+
+document.addEventListener('DOMContentLoaded', getQuotes)
+changeQuoteBtn.addEventListener('click', getQuotes)
