@@ -1,20 +1,42 @@
+import playList from './playList.js'
+
+
+// date and time
 const timeElement = document.querySelector('time')
 const dateElement = document.querySelector('date')
+
+// greeting
 const greeting = document.querySelector('.greeting')
 const nameInput = document.querySelector('.name')
-const cityInput = document.querySelector('.city')
+
+// image slider
 const slideNext = document.querySelector('.slide-next')
 const slidePrev = document.querySelector('.slide-prev')
 let randomNum = getRandomNum()
+
+// weather widget
+const cityInput = document.querySelector('.city')
 const weatherIcon = document.querySelector('.weather-icon')
 const temperature = document.querySelector('.temperature')
 const weatherDescription = document.querySelector('.weather-description')
 const wind = document.querySelector('.wind')
 const humidity = document.querySelector('.humidity')
+
+// quote widget
 const changeQuoteBtn = document.querySelector('.change-quote')
 const quote = document.querySelector('.quote')
 const author = document.querySelector('.author')
 let currentQuoteIndex = Math.floor(Math.random() * 6)
+
+// audio player
+const playBtn = document.querySelector('.play')
+const playNextBtn = document.querySelector('.play-next')
+const playPrevBtn = document.querySelector('.play-prev')
+const playListContainer = document.querySelector('.play-list')
+const audio = new Audio()
+let isPlay = false
+let playNum = 0
+
 
 
 
@@ -186,7 +208,7 @@ async function getQuotes() {
   if (currentQuoteIndex > 5) {
     currentQuoteIndex = 0
   } else if (currentQuoteIndex < 0) {
-    currentQuoteIndex = 6
+    currentQuoteIndex = 5
   }
   
   quote.textContent = `"${data[currentQuoteIndex].text}"`
@@ -196,3 +218,80 @@ async function getQuotes() {
 
 document.addEventListener('DOMContentLoaded', getQuotes)
 changeQuoteBtn.addEventListener('click', getQuotes)
+
+
+
+
+function createPlayListHTML() {   // add play list to the HTML document
+  playList.forEach(music => {
+    const li = document.createElement('li')
+    li.classList.add('play-item')
+    li.textContent = music.title
+    playListContainer.append(li)
+  })
+}
+
+
+function playAudio() {
+  if (!audio.src) {   // if there are no active songs, create new song
+    audio.src = playList[playNum].src
+    audio.currentTime = 0
+    const liActive = playListContainer.childNodes[playNum]
+    liActive.classList.add('item-active')
+  }
+  
+  if (!isPlay) {
+    audio.play()
+    isPlay = true
+  } else {
+    audio.pause()
+    isPlay = false
+  }
+
+  playBtn.classList.toggle('pause')
+}
+
+
+function playChangeAudio() {    // play new music
+  audio.src = playList[playNum].src
+  audio.currentTime = 0
+  audio.play()
+
+  if (!playBtn.classList.contains('pause')) {
+    playBtn.classList.add('pause')
+    isPlay = true
+  }
+
+  playListContainer.childNodes.forEach(item => {    // remove item-active
+    if (item.classList.contains('item-active')) {
+      item.classList.remove('item-active')
+    }
+  })
+  const liActive = playListContainer.childNodes[playNum]
+  liActive.classList.toggle('item-active')
+}
+
+
+function playNext() {
+  playNum++
+  if (playNum > 3) {
+    playNum = 0
+  }
+  playChangeAudio()
+}
+
+
+function playPrev() {
+  playNum--
+  if (playNum < 0) {
+    playNum = 3
+  }
+  playChangeAudio()
+}
+
+
+document.addEventListener('DOMContentLoaded', createPlayListHTML)
+playBtn.addEventListener('click', playAudio)
+playNextBtn.addEventListener('click', playNext)
+playPrevBtn.addEventListener('click', playPrev)
+audio.addEventListener('ended', playNext)
