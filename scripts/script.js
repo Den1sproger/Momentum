@@ -132,7 +132,6 @@ function setBg() {
     document.body.style.backgroundImage = `url('${img.src}')`
   }
 }
-setBg()
 
 
 function getSlideNext() {
@@ -148,6 +147,7 @@ function getSlidePrev() {
 
 
 // add slide listeners
+document.addEventListener('DOMContentLoaded', setBg)
 slideNext.addEventListener('click', getSlideNext)
 slidePrev.addEventListener('click', getSlidePrev)
 
