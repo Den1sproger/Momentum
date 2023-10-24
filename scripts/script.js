@@ -1,6 +1,9 @@
 import playList from './playList.js'
 
 
+let language = 'en'
+const langBtn = document.querySelector('.language')
+
 // date and time
 const timeElement = document.querySelector('time')
 const dateElement = document.querySelector('date')
@@ -40,25 +43,43 @@ let playNum = 0
 
 
 
-function getTimeOfDay() {
+function getWelcomeTimeOfDay(lang='en') {
   const dateTime = new Date();
   const hours = dateTime.getHours()
+  const greetingTranslation = {
+    night: {
+      en: 'Good night',
+      ru: 'Доброй ночи'
+    },
+    morning: {
+      en: 'Good morning',
+      ru: 'Доброе утро'
+    },
+    afternoon: {
+      en: 'Good afternoon',
+      ru: 'Добрый день'
+    },
+    evening: {
+      en: 'Good evening',
+      ru: 'Добрый вечер'
+    }
+  }
 
   if (hours >= 0 && hours <= 3) {
-    return 'night'
+    return greetingTranslation.night[lang]
   } else if (hours >= 4 && hours <= 11) {
-    return 'morning'
+    return greetingTranslation.morning[lang]
   } else if (hours >= 12 && hours <= 16) {
-    return 'afternoon'
+    return greetingTranslation.afternoon[lang]
   } else {
-    return 'evening'
+    return greetingTranslation.evening[lang]
   }
 }
 
 
 function showGreeting() {
-  const timeOfDay = getTimeOfDay()
-  greeting.textContent = `Good ${timeOfDay}`
+  const welcomeTimeOfDay = getWelcomeTimeOfDay(language)
+  greeting.textContent = welcomeTimeOfDay
 }
 
 
@@ -66,7 +87,7 @@ function showDateTime() {
   const dateTime = new Date();
 
   // show time
-  const currentTime = dateTime.toLocaleTimeString();
+  const currentTime = dateTime.toLocaleTimeString()
   timeElement.textContent = currentTime
   
   // show date
@@ -75,7 +96,7 @@ function showDateTime() {
     month: 'long',
     day: 'numeric'
   }
-  const currentDate = dateTime.toLocaleDateString('en-US', options)
+  const currentDate = dateTime.toLocaleDateString(language, options)
   dateElement.textContent = currentDate
 
   showGreeting()
@@ -123,11 +144,12 @@ function getRandomNum() {
 
 // set background image
 function setBg() {
-  const timeOfDay = getTimeOfDay()
+  const welcomeTimeOfDay = getWelcomeTimeOfDay()
+  const words = welcomeTimeOfDay.split(' ')
   const bgNum = String(randomNum).padStart(2, "0")
   const img = new Image()
 
-  img.src = `https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/${timeOfDay}/${bgNum}.jpg`
+  img.src = `https://raw.githubusercontent.com/rolling-scopes-school/stage1-tasks/assets/images/${words[1]}/${bgNum}.jpg`
   img.onload = () => {
     document.body.style.backgroundImage = `url('${img.src}')`
   }
@@ -135,13 +157,19 @@ function setBg() {
 
 
 function getSlideNext() {
-  randomNum >= 20 ? randomNum = 1 : randomNum += 1
+  randomNum++
+  if (randomNum >= 20) {
+    randomNum = 1
+  }
   setBg()
 }
 
 
 function getSlidePrev() {
-  randomNum <= 1 ? randomNum = 20 : randomNum -= 1
+  randomNum--
+  if (randomNum <= 1) {
+    randomNum = 20
+  }
   setBg()
 }
 
@@ -155,7 +183,7 @@ slidePrev.addEventListener('click', getSlidePrev)
 
 
 async function getWeather() {
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityInput.value}&lang=en&appid=b50b70ec933b37883cbac2d86479f831&units=metric`
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityInput.value}&lang=${language}&appid=b50b70ec933b37883cbac2d86479f831&units=metric`
   const res = await fetch(url)    // get weather data from api
   const weatherError = document.querySelector('.weather-error')
   if (weatherError) {
@@ -166,17 +194,33 @@ async function getWeather() {
   if (res.status === 200) {   // show weather
     const data = await res.json()
     
+    const windTranslate = {
+      en: 'Wind speed',
+      ru: 'Скорость ветра'
+    }
+    const speedTranslate = {
+      en: 'm/s',
+      ru: 'м/с'
+    }
+    const humidityTranslate = {
+      en: 'Humidity',
+      ru: 'Влажность'
+    }
     weatherIcon.classList.add(`owf-${data.weather[0].id}`)
     temperature.textContent = `${Math.round(data.main.temp)}°C`
     weatherDescription.textContent = data.weather[0].description
-    wind.textContent = `Wind speed: ${Math.round(data.wind.speed)}`
-    humidity.textContent = `Humidity: ${Math.round(data.main.humidity)}`
+    wind.textContent = `${windTranslate[language]}: ${Math.round(data.wind.speed)} ${speedTranslate[language]}`
+    humidity.textContent = `${humidityTranslate[language]}: ${Math.round(data.main.humidity)}`
 
   } else {          // show error
     const desContainer = document.querySelector('.description-container')
+    const errorTranslate = {
+      en: 'Error! city not found for',
+      ru: 'Ошибка! Не найден город с названием'
+    }
     desContainer.insertAdjacentHTML(
       'beforebegin',
-      `<div class="weather-error">Error! city not found for '${cityInput.value}'!</div>`
+      `<div class="weather-error">${errorTranslate[language]} '${cityInput.value}'!</div>`
     )
     temperature.textContent = ''
     weatherDescription.textContent = ''
@@ -199,16 +243,22 @@ cityInput.addEventListener('keypress', setCity)
 
 
 
-async function getQuotes() {  
-  const quotes = 'scripts/quotes.json'
+async function getQuotes(changeIndex=true) {
+  const qoutesFiles = {
+    en: 'scripts/quotes_en.json',
+    ru: 'scripts/quotes_ru.json'
+  }
+  const quotes = qoutesFiles[language]
   const res = await fetch(quotes)
   const data = await res.json()
 
-  currentQuoteIndex += 1
-  if (currentQuoteIndex > 5) {
-    currentQuoteIndex = 0
-  } else if (currentQuoteIndex < 0) {
-    currentQuoteIndex = 5
+  if (changeIndex) {
+    currentQuoteIndex += 1
+    if (currentQuoteIndex > 5) {
+      currentQuoteIndex = 0
+    } else if (currentQuoteIndex < 0) {
+      currentQuoteIndex = 5
+    }
   }
   
   quote.textContent = `"${data[currentQuoteIndex].text}"`
@@ -295,3 +345,24 @@ playBtn.addEventListener('click', playAudio)
 playNextBtn.addEventListener('click', playNext)
 playPrevBtn.addEventListener('click', playPrev)
 audio.addEventListener('ended', playNext)
+
+
+
+
+langBtn.addEventListener('click', function () {
+  langBtn.classList.toggle('ru')
+  
+  if (language === 'en') {
+    language = 'ru'
+    langBtn.textContent = 'RU'
+    cityInput.placeholder = '[Введите город]'
+    nameInput.placeholder = '[Введите имя]'
+  } else {
+    language = 'en'
+    langBtn.textContent = 'EN'
+    cityInput.placeholder = '[Enter city]'
+    nameInput.placeholder = '[Enter name]'
+  }
+  getWeather()
+  getQuotes(false)
+})
