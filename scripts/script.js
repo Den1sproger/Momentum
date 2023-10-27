@@ -1,14 +1,21 @@
 import playList from './playList.js'
 
 
+// settings
+const settingsBtn = document.querySelector('.settings')
+const settings = document.querySelector('.settings-menu')
 let language = 'en'
 const langBtn = document.querySelector('.language')
+const settingsCheckBoxes = document.querySelectorAll('input[type="checkbox"]')
+const photoSource = document.querySelector('.photo-source')
+const blockNames = document.querySelectorAll('.block-name')
 
 // date and time
 const timeElement = document.querySelector('time')
-const dateElement = document.querySelector('date')
+const dateElement = document.querySelector('.date')
 
 // greeting
+const greetingContainer = document.querySelector('.greeting-container')
 const greeting = document.querySelector('.greeting')
 const nameInput = document.querySelector('.name')
 
@@ -18,6 +25,7 @@ const slidePrev = document.querySelector('.slide-prev')
 let randomNum = getRandomNum()
 
 // weather widget
+const weatherContainer = document.querySelector('.weather')
 const cityInput = document.querySelector('.city')
 const weatherIcon = document.querySelector('.weather-icon')
 const temperature = document.querySelector('.temperature')
@@ -26,12 +34,14 @@ const wind = document.querySelector('.wind')
 const humidity = document.querySelector('.humidity')
 
 // quote widget
+const quoteContainer = document.querySelector('.quote-container')
 const changeQuoteBtn = document.querySelector('.change-quote')
 const quote = document.querySelector('.quote')
 const author = document.querySelector('.author')
 let currentQuoteIndex = Math.floor(Math.random() * 6)
 
 // audio player
+const playerContainer = document.querySelector('.player')
 const playBtn = document.querySelector('.play')
 const playNextBtn = document.querySelector('.play-next')
 const playPrevBtn = document.querySelector('.play-prev')
@@ -43,8 +53,75 @@ let playNum = 0
 
 
 
+// -------- SETTINGS SECTION --------
+const blocksContainers = {
+  audio: playerContainer,
+  weather: weatherContainer,
+  time: timeElement,
+  date: dateElement,
+  greeting: greetingContainer,
+  quote: quoteContainer
+}
+
+settingsBtn.addEventListener('click', function () {
+  settings.classList.toggle('active')
+})
+
+
+for (let checkBox of settingsCheckBoxes) {
+  checkBox.addEventListener('change', function (element) {
+    const block = blocksContainers[element.target.value]
+    block.classList.toggle('hidden')
+  })
+}
+
+
+function switchSettingsLang() {
+  const blocksTranslation = {
+    audio: {
+      en: 'Audio',
+      ru: 'Аудио'
+    },
+    weather: {
+      en: 'Weather',
+      ru: 'Погода'
+    },
+    time: {
+      en: 'Time',
+      ru: 'Время'
+    },
+    date: {
+      en: 'Date',
+      ru: 'Дата'
+    },
+    greeting: {
+      en: 'Greeting',
+      ru: 'Приветствие'
+    },
+    quote: {
+      en: 'Quote',
+      ru: 'Цитата'
+    }
+  }
+
+  const photoSourceTranslation = {
+    en: 'Photo source',
+    ru: 'Источник фото'
+  }
+  photoSource.textContent = photoSourceTranslation[language]
+
+  Object.keys(blocksTranslation).forEach((item, index, array) => {
+    const value = blocksTranslation[item]
+    blockNames[index].textContent = value[language]
+  })
+}
+
+
+
+
+// -------- DATETIME AND GREEETING SECTION --------
 function getWelcomeTimeOfDay(lang='en') {
-  const dateTime = new Date();
+  const dateTime = new Date()
   const hours = dateTime.getHours()
   const greetingTranslation = {
     night: {
@@ -111,12 +188,20 @@ showDateTime()
 function setLocalStorage() {
   localStorage.setItem('userName', nameInput.value)
   localStorage.setItem('userCity', cityInput.value)
+  localStorage.setItem('language', language)
+  
+  settingsCheckBoxes.forEach(checkBox => {
+    localStorage.setItem(`block-${checkBox.value}`, checkBox.checked)
+  })
 }
 
 // get data from local storage
 function getLocalStorage() {
+  const languageFromLS = localStorage.getItem('language')
   const nameFromLS = localStorage.getItem('userName')
   const cityFromLS = localStorage.getItem('userCity')
+
+  language = languageFromLS
 
   if (nameFromLS !== null) {
     nameInput.value = nameFromLS
@@ -127,6 +212,19 @@ function getLocalStorage() {
   } else {
     cityInput.value = 'Minsk'
   }
+
+
+  settingsCheckBoxes.forEach(checkBox => {
+    const stateFromLS = localStorage.getItem(`block-${checkBox.value}`)
+
+    if (stateFromLS !== null) {
+      checkBox.checked = stateFromLS === 'true'
+      if (checkBox.checked) {
+        const block = blocksContainers[checkBox.value]
+        block.classList.toggle('hidden')
+      }
+    }
+  })
 }
 
 // add local storage listeners
@@ -136,6 +234,7 @@ window.addEventListener('DOMContentLoaded', getLocalStorage)
 
 
 
+// -------- BACKGROUND IMAGE WITH SLIDER SECTION --------
 // get random number from 1 to 20
 function getRandomNum() {
   return Math.floor(Math.random() * 20) + 1
@@ -182,6 +281,7 @@ slidePrev.addEventListener('click', getSlidePrev)
 
 
 
+// -------- WEATHER SECTION --------
 async function getWeather() {
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityInput.value}&lang=${language}&appid=b50b70ec933b37883cbac2d86479f831&units=metric`
   const res = await fetch(url)    // get weather data from api
@@ -243,6 +343,7 @@ cityInput.addEventListener('keypress', setCity)
 
 
 
+// -------- QUOTES SECTION --------
 async function getQuotes(changeIndex=true) {
   const qoutesFiles = {
     en: 'scripts/quotes_en.json',
@@ -272,6 +373,7 @@ changeQuoteBtn.addEventListener('click', getQuotes)
 
 
 
+// -------- MUSIC PLAY LIST SECTION --------
 function createPlayListHTML() {   // add play list to the HTML document
   playList.forEach(music => {
     const li = document.createElement('li')
@@ -349,9 +451,10 @@ audio.addEventListener('ended', playNext)
 
 
 
+// -------- LANGUAGE SWITCH --------
 langBtn.addEventListener('click', function () {
   langBtn.classList.toggle('ru')
-  
+
   if (language === 'en') {
     language = 'ru'
     langBtn.textContent = 'RU'
@@ -363,6 +466,14 @@ langBtn.addEventListener('click', function () {
     cityInput.placeholder = '[Enter city]'
     nameInput.placeholder = '[Enter name]'
   }
+
+  if (cityInput.value === 'Minsk') {
+    cityInput.value = 'Минск'
+  } else if (cityInput.value === 'Минск') {
+    cityInput.value = 'Minsk'
+  }
+
   getWeather()
   getQuotes(false)
+  switchSettingsLang()
 })

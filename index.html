@@ -23,7 +23,9 @@
       <ul class="play-list"></ul>
     </div>
 
-    <button class="language">EN</button>
+    <button class="settings">
+      <img src="assets/svg/settings.svg" alt="settings">
+    </button>
 
     <div class="weather">
       <input type="text" class="city" placeholder="[Enter city]">
@@ -37,6 +39,50 @@
       <div class="humidity"></div>
     </div>
 
+    <div class="settings-menu">
+      <button class="language">EN</button>
+      <p><span class="photo-source">Photo source</span> - GitHub</p>
+  
+      <div class="blocks">
+        <div class="blocks__switches">
+          <label>
+            <input type="checkbox" value="audio">
+            <span class="switcher"></span>
+          </label>
+          <label>
+            <input type="checkbox" value="weather">
+            <span class="switcher"></span>
+          </label>
+          <label>
+            <input type="checkbox" value="time">
+            <span class="switcher"></span>
+          </label>
+          <label>
+            <input type="checkbox" value="date">
+            <span class="switcher"></span>
+          </label>
+          <label>
+            <input type="checkbox" value="greeting">
+            <span class="switcher"></span>
+          </label>
+          <label>
+            <input type="checkbox" value="quote">
+            <span class="switcher"></span>
+          </label>
+        </div>
+  
+        <div class="blocks__names">
+          <p class="block-name">Audio</p>
+          <p class="block-name">Weather</p>
+          <p class="block-name">Time</p>
+          <p class="block-name">Date</p>
+          <p class="block-name">Greeting</p>
+          <p class="block-name">Quote</p>
+        </div>
+  
+      </div>
+    </div>
+
   </header>
 
 
@@ -48,7 +94,7 @@
     </div>
 
     <time></time>
-    <date class="date"></date>
+    <div class="date"></div>
 
     <div class="greeting-container">
       <span class="greeting"></span>
