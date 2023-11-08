@@ -1,0 +1,38 @@
+{
+  "name": "momentum",
+  "version": "1.0.0",
+  "description": "Momentum RSS School application",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack --mode development",
+    "watch": "webpack --mode development --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Den1sproger/Momentum.git"
+  },
+  "keywords": [
+    "Momentum",
+    "JavaScript",
+    "Front-End",
+    "RSS",
+    "School"
+  ],
+  "author": "Denis Strigo <strigodenis@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Den1sproger/Momentum/issues"
+  },
+  "homepage": "https://github.com/Den1sproger/Momentum#readme",
+  "devDependencies": {
+    "clean-webpack-plugin": "^4.0.0",
+    "css-loader": "^6.8.1",
+    "filemanager-webpack-plugin": "^8.0.0",
+    "html-webpack-plugin": "^5.5.3",
+    "style-loader": "^3.3.3",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  }
+}

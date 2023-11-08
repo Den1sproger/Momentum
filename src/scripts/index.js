@@ -1,4 +1,7 @@
 import playList from './playList.js'
+// import '../css/style.css'
+// import '../css/owfont-regular.css'
+
 
 
 // settings
@@ -201,7 +204,11 @@ function getLocalStorage() {
   const nameFromLS = localStorage.getItem('userName')
   const cityFromLS = localStorage.getItem('userCity')
 
-  language = languageFromLS
+  if (nameFromLS !== null) {
+    language = languageFromLS
+  } else {
+    language = 'en'
+  }
 
   if (nameFromLS !== null) {
     nameInput.value = nameFromLS
@@ -346,8 +353,8 @@ cityInput.addEventListener('keypress', setCity)
 // -------- QUOTES SECTION --------
 async function getQuotes(changeIndex=true) {
   const qoutesFiles = {
-    en: 'scripts/quotes_en.json',
-    ru: 'scripts/quotes_ru.json'
+    en: './assets/json/quotes_en.json',
+    ru: './assets/json/quotes_ru.json'
   }
   const quotes = qoutesFiles[language]
   const res = await fetch(quotes)
